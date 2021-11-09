@@ -26,6 +26,13 @@ public class UserController {
         return "index";
     }
 
+    @GetMapping("/list_users")
+    public String viewUsersList(Model model) {
+        List<User> userList = userService.findAll();
+        model.addAttribute("listUsers", userList);
+        return "users";
+    }
+
     @GetMapping("/register")
     public String showSignUpForm(Model model) {
         model.addAttribute("user", new User());
@@ -38,17 +45,16 @@ public class UserController {
         return "register_success";
     }
 
-    @GetMapping("/list_users")
-    public String viewUsersList(Model model) {
-        List<User> userList = userService.findAll();
-        model.addAttribute("listUsers", userList);
-        return "users";
+    @GetMapping("/login")
+    public String login(Model model) {
+        model.addAttribute("user", new User());
+        return "login_form";
     }
 
-    @GetMapping("/login")
-    public String login(String email, String password) {
-        Optional<User> user = userService.findUserByEmailAndPassword(email, password);
-        if (user.isPresent()) return "user";
-        else return "index";
+    @PostMapping("/process_login")
+    public String processLogin(User user) {
+        Optional<User> foundUser = userService.findUserByEmailAndPassword(user.getEmail(), user.getPassword());
+        if(foundUser.isPresent()) return "user";
+        else return "login_form";
     }
 }
